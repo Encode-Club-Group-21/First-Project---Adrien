@@ -36,7 +36,6 @@ async function main(ballotAdd?: string) {
   const voter = await ballotContract.voters(address);
   console.log(voter, "address", address);
   console.log("vote", vote);
-  getWinner(ballotAddress);
 }
 
 main().catch((error) => {
