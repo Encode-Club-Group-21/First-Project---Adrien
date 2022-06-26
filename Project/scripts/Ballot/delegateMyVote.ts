@@ -32,8 +32,8 @@ async function main() {
   if (chairpersonAddress !== signer.address)
     throw new Error("Caller is not the chairperson for this contract");
   console.log(`Giving right to vote to ${delegatedAddress}`);
-  const tx = await ballotContract.giveRightToVote(delegatedAddress);
-  await tx.wait();
+
+  // make sure the address has the right to vote
   console.log("Right given");
   const delegate = await ballotContract.delegate(delegatedAddress);
   await delegate.wait();
