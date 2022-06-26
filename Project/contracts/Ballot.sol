@@ -62,7 +62,10 @@ contract Ballot {
             "Only chairperson can give right to vote."
         );
         require(!voters[voter].voted, "The voter already voted.");
-        require(voters[voter].weight == 0);
+        require(
+            voters[voter].weight == 0,
+            "The person already has the right to vote"
+        );
         voters[voter].weight = 1;
     }
 
@@ -94,7 +97,10 @@ contract Ballot {
         Voter storage delegate_ = voters[to];
 
         // Voters cannot delegate to wallets that cannot vote.
-        require(delegate_.weight >= 1);
+        require(
+            delegate_.weight >= 1,
+            "The wallet you are trying to delegate to can't vote"
+        );
         sender.voted = true;
         sender.delegate = to;
         if (delegate_.voted) {

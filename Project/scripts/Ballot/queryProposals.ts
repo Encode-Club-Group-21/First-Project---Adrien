@@ -11,19 +11,12 @@ const EXPOSED_KEY =
 
 async function main() {
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY ?? EXPOSED_KEY);
+
   console.log(`Using address ${wallet.address}`);
   const provider = ethers.providers.getDefaultProvider("ropsten");
   const signer = wallet.connect(provider);
-  const balanceBN = await signer.getBalance();
-  const balance = Number(ethers.utils.formatEther(balanceBN));
-  console.log(`Wallet balance ${balance}`);
-  if (balance < 0.01) {
-    throw new Error("Not enough ether");
-  }
   if (process.argv.length < 3) throw new Error("Ballot address missing");
   const ballotAddress = process.argv[2];
-  if (process.argv.length < 4) throw new Error("Voter address missing");
-  const voterAddress = process.argv[3];
   console.log(
     `Attaching ballot contract interface to address ${ballotAddress}`
   );
@@ -32,14 +25,17 @@ async function main() {
     ballotJson.abi,
     signer
   ) as Ballot;
-  const chairpersonAddress = await ballotContract.chairperson();
-  if (chairpersonAddress !== signer.address)
-    throw new Error("Caller is not the chairperson for this contract");
-  console.log(`Giving right to vote to ${voterAddress}`);
-  const tx = await ballotContract.giveRightToVote(voterAddress);
-  console.log("Awaiting confirmations");
-  await tx.wait();
-  console.log(`Transaction completed. Hash: ${tx.hash}`);
+  let stillExists = true;
+  let i = 0;
+  while (stillExists) {
+    try {
+      const proposal = await ballotContract.proposals(i);
+      console.log(ethers.utils.parseBytes32String(proposal[0]));
+      i++;
+    } catch (err) {
+      stillExists = false;
+    }
+  }
 }
 
 main().catch((error) => {
