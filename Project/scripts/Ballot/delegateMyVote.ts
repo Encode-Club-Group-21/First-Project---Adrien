@@ -34,11 +34,14 @@ async function main() {
   console.log(`Giving right to vote to ${delegatedAddress}`);
 
   // make sure the address has the right to vote
+  const voter = await ballotContract.voters(delegatedAddress);
+
+  if (voter.weight.toNumber() < 1)
+    throw new Error("This address does not have the right to vote!");
   console.log("Right given");
   const delegate = await ballotContract.delegate(delegatedAddress);
   await delegate.wait();
   console.log("Delegated!");
-  const voter = await ballotContract.voters(delegatedAddress);
   console.log(voter.weight.toNumber());
 }
 
