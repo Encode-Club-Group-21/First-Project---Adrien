@@ -33,6 +33,7 @@ async function main(ballotAdd?: string) {
   const vote = await ballotContract.vote(proposal);
   await vote.wait();
   const address = wallet.address;
+  // seeking confirmation that the address has voted
   const voter = await ballotContract.voters(address);
   console.log(voter, "address", address);
   console.log("vote", vote);
